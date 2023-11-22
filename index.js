@@ -57,20 +57,31 @@ app.get("/fav", async function (req, res) {
 
     // Adding search
     //http://localhost:5001/fav?search=Cashews
+    // if (req.query.search) {
+    //   if (req.query.category) {
+    //     query += ` AND`;
+    //   } 
+    //   else {
+    //     query += ` WHERE`;
+    //   }
+    //   query += ` items.item_name ILIKE '%${req.query.search}%'`;
+    // }
+
     if (req.query.search) {
-      if (req.query.category) {
-        query += ` AND`;
-      } else {
-        query += ` WHERE`;
+        query += ` WHERE items.item_name ILIKE '%${req.query.search}%'`;
       }
-      query += ` items.item_name ILIKE '%${req.query.search}%'`;
-    }
+      
+
+
 
     // Adding sorting
-    if (req.query.orderBy) {
-      const sortOrder = req.query.sortOrder === "desc" ? "DESC" : "ASC";
-      query += ` ORDER BY ${req.query.orderBy} ${sortOrder}`;
-    }
+    if (req.query.sortOrder) {
+  const sortOrder = req.query.sortOrder === "desc" ? "DESC" : "ASC";
+  query += ` ORDER BY ${sortOrder}`;
+}
+
+
+
 
     // Adding sorting by price range
     //http://localhost:5001/fav?priceRange=0-500
@@ -94,6 +105,7 @@ app.get("/fav", async function (req, res) {
   }
 });
 
+//get rating
 app.get("/rating", async function (req, res) {
   const pgRes = await pgClient.query(
     "SELECT items.*, AVG(CASE WHEN ratings.rating IS NOT NULL THEN ratings.rating ELSE 0 END) AS overall_rating FROM items LEFT JOIN ratings ON items.item_id = ratings.item_id GROUP BY items.item_id",
