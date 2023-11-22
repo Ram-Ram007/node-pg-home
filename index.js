@@ -96,8 +96,8 @@ app.get("/fav", async function (req, res) {
 
 
 app.get("/rating", async function (req, res) {
-    const pgRes = await pgClient.query("SELECT * from items LIMIT $1", [
-      req.query.limit || 1,
+    const pgRes = await pgClient.query("", [
+    
     ]);
   
     res.json({
