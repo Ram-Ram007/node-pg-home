@@ -68,20 +68,20 @@ app.get("/fav", async function (req, res) {
 
     // Adding sorting
     if (req.query.orderBy) {
-        const sortOrder = req.query.sortOrder === "desc" ? "DESC" : "ASC";
-        query += ` ORDER BY ${req.query.orderBy} ${sortOrder}`;
-      }
+      const sortOrder = req.query.sortOrder === "desc" ? "DESC" : "ASC";
+      query += ` ORDER BY ${req.query.orderBy} ${sortOrder}`;
+    }
 
-         // Adding sorting by price range
-         //http://localhost:5001/fav?priceRange=0-500
+    // Adding sorting by price range
+    //http://localhost:5001/fav?priceRange=0-500
     if (req.query.priceRange) {
-        const priceRanges = req.query.priceRange.split("-");
-        const minPrice = parseFloat(priceRanges[0]);
-        const maxPrice = parseFloat(priceRanges[1]);
-  
-        query += ` AND items.price BETWEEN ${minPrice} AND ${maxPrice}`;
-      }
-  
+      const priceRanges = req.query.priceRange.split("-");
+      const minPrice = parseFloat(priceRanges[0]);
+      const maxPrice = parseFloat(priceRanges[1]);
+
+      query += ` AND items.price BETWEEN ${minPrice} AND ${maxPrice}`;
+    }
+
     const pgRes = await pgClient.query(query);
 
     res.json({
@@ -94,20 +94,17 @@ app.get("/fav", async function (req, res) {
   }
 });
 
-
 app.get("/rating", async function (req, res) {
-    const pgRes = await pgClient.query("", [
-    
-    ]);
-  
-    res.json({
-      rows: pgRes.rows,
-      count: pgRes.rowCount,
-    });
+  const pgRes = await pgClient.query(
+    "SELECT items.*, AVG(CASE WHEN ratings.rating IS NOT NULL THEN ratings.rating ELSE 0 END) AS overall_rating FROM items LEFT JOIN ratings ON items.item_id = ratings.item_id GROUP BY items.item_id",
+    []
+  );
+
+  res.json({
+    rows: pgRes.rows,
+    count: pgRes.rowCount,
   });
-  
-
-
+});
 
 app.delete("/remove", async function (req, res) {
   const pgRes = await pgClient.query(
