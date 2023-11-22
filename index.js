@@ -49,11 +49,6 @@ app.get("/fav", async function (req, res) {
     try {
       let query = "SELECT items.* FROM items JOIN favourites ON items.item_id = favourites.item_id";
   
-      // Adding filters
-      if (req.query.category) {
-        query += ` WHERE items.category = '${req.query.category}'`;
-      }
-  
       // Adding search
       //http://localhost:5001/fav?search=Cashews
       if (req.query.search) {
