@@ -48,6 +48,11 @@ app.patch("/update-user", async function (req, res) {
 app.get("/fav", async function (req, res) {
     try {
       let query = "SELECT items.* FROM items JOIN favourites ON items.item_id = favourites.item_id";
+
+      //http://localhost:5001/fav?user_id=2
+      if (req.query.user_id) {
+        query += ` WHERE favourites.user_id = ${req.query.user_id}`;
+    }
   
       // Adding search
       //http://localhost:5001/fav?search=Cashews
