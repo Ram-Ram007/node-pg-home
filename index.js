@@ -45,13 +45,33 @@ app.patch("/update-user", async function (req, res) {
     count: pgRes.rowCount,
   });
 });
-
 app.get("/fav", async function (req, res) {
     try {
-      const pgRes = await pgClient.query(
-        "SELECT items.* FROM items JOIN favourites ON items.item_id = favourites.item_id",
-        
-      );
+      let query = "SELECT items.* FROM items JOIN favourites ON items.item_id = favourites.item_id";
+  
+      // Adding filters
+      if (req.query.category) {
+        query += ` WHERE items.category = '${req.query.category}'`;
+      }
+  
+      // Adding search
+      //http://localhost:5001/fav?search=Cashews
+      if (req.query.search) {
+        if (req.query.category) {
+          query += ` AND`;
+        } else {
+          query += ` WHERE`;
+        }
+        query += ` items.item_name ILIKE '%${req.query.search}%'`;
+      }
+  
+      // Adding sorting
+      if (req.query.sortBy) {
+        const sortOrder = req.query.sortOrder === "desc" ? "DESC" : "ASC";
+        query += ` ORDER BY ${req.query.sortBy} ${sortOrder}`;
+      }
+  
+      const pgRes = await pgClient.query(query);
   
       res.json({
         rows: pgRes.rows,
