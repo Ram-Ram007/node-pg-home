@@ -99,7 +99,6 @@ app.get("/item", async function (req, res) {
     const pgRes = await pgClient.query("SELECT * from items LIMIT $1", [
       req.query.limit || 1,
     ]);
-    
   
     res.json({
       rows: pgRes.rows,
